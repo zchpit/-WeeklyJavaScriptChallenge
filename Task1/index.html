@@ -1,0 +1,56 @@
+<html>
+  <label id=lbInfo> Enter number </label> <br/>
+  <input type="input" text="Enter number here" id="tbInput" /><br/>
+  <input type="submit" value="Submit" id="tbSubmit" /><br/>
+  <label id=lbResult>Result: </label><br/>
+</html>
+
+<script>
+document.getElementById("tbSubmit").addEventListener("click", function(){
+    var input = GetInput();
+    if (!ValidateInput(input))
+    	  ShowError(input)
+    else
+    {
+      var primes = GetPrimeNumbers(input);
+      ShowPrimeNumber(primes);
+    }
+});
+function GetInput()
+{
+	return document.getElementById("tbInput").value;;
+}
+function ValidateInput(input)
+{
+  var intInput = parseInt(input);
+  return Number.isInteger(intInput) && intInput >= 0 && intInput <= 10000;
+}
+function ShowMessage(message)
+{
+  	document.getElementById("lbResult").textContent = message;
+}
+function ShowError(input)
+{
+  var response = "Result: " + input + " is not a positive number less than 10001";
+	ShowMessage(response);
+}
+function GetPrimeNumbers(max)
+{
+  var sieve = [], i, j, primes = [];
+  for (i = 2; i <= max; ++i) {
+      if (!sieve[i]) {
+          // i has not been marked -- it is prime
+          primes.push(i);
+          for (j = i << 1; j <= max; j += i) {
+              sieve[j] = true;
+          }
+      }
+  }
+  return primes;
+}
+function ShowPrimeNumber(primes)
+{
+    var response = "Result: " + primes;
+  	ShowMessage(response);
+}
+</script>
