@@ -46,7 +46,7 @@
   </div>
   <br/>
   <div id="updateInfo">
-    <label id=lbUpdateInfo> Last time updated </label>
+    <label id=lbUpdateInfo> Last time updated: </label>
     <label id=lbUpdateDate> </label>
   </div>
   </body>
@@ -122,9 +122,10 @@ function getDataFromForm()
   }
   var invoice = {invoiceAmount:invoiceAmount, invoiceStatus:invoiceStatus};
   var currentdate = new Date();
-  var datetime = "Last Sync: " + currentdate.getDate() + "/"
-                  + (currentdate.getMonth()+1)  + "/"
-                  + currentdate.getFullYear() + " @ "
+  var datetime = ""
+                  + currentdate.getFullYear() + "-"
+                  + (currentdate.getMonth()+1)  + "-"
+                  + currentdate.getDate() + " "
                   + currentdate.getHours() + ":"
                   + currentdate.getMinutes() + ":"
                   + currentdate.getSeconds();
@@ -164,7 +165,6 @@ function setDataToForm(formData)
 
   var radios = document.getElementsByName('invoiceStatus');
   var invoiceStatus =formData.invoice.invoiceStatus != undefined ? formData.invoice.invoiceStatus : 'issued';
-
   for (var i = 0, length = radios.length; i < length; i++) {
       if(invoiceStatus = radios[i].value){
           radios[i].checked = true;
@@ -173,6 +173,6 @@ function setDataToForm(formData)
           radios[i].checked = false;
       }
   }
-  document.getElementById("lbUpdateDate").value = formData.datetime != undefined ? formData.datetime : '';
+  document.getElementById("lbUpdateDate").textContent = formData.datetime != undefined ? formData.datetime : '';
 };
 </script>
