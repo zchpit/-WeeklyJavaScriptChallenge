@@ -28,7 +28,7 @@
     <label id=lbCompanyCity> City </label>
     <input type="input" text="" id="tbCompanyCity" />
     <label id=lbCompanyStreet> Street </label>
-    <input type="input" text="" id="tbCompanySurname" />
+    <input type="input" text="" id="tbCompanyStreet" />
     <label id=lbCompanyPostalCode> Postal code </label>
     <input type="input" text="" id="tbCompanyPostalCode" />
   </div>
@@ -47,7 +47,7 @@
   <br/>
   <div id="updateInfo">
     <label id=lbUpdateInfo> Last time updated </label>
-    <label id=lbUpdateDate> Amount </label>
+    <label id=lbUpdateDate> </label>
   </div>
   </body>
 </html>
@@ -56,31 +56,32 @@
 window.onload = function() {
   loadObjectAfterPageLoad();
 };
-/*
-document.getElementsByTagName("radio").addEventListener("change", function(){
-  objectChanged();
-});*/
-var input = document.getElementsByTagName("input")[0];
-input.addEventListener("input", function(){
-  objectChanged();
+
+var inputs = document.getElementsByTagName("input");
+for (var i = 0; i < inputs.length ; i++) {
+    inputs[i].addEventListener("input",
+        function () {
+            objectChanged();
+        },
+        false);
+}
+var radios = document.querySelectorAll('input[type=radio][name="invoiceStatus"]');
+Array.prototype.forEach.call(radios, function(radio) {
+   radio.addEventListener('change', objectChanged);
 });
+
 function loadObjectAfterPageLoad()
 {
-  var client = readFromLocalStorage("client");
+  var client = readFromLocalStorage("formData");
 
   if(client != null)
-    setObjectToForm(client);
+    setDataToForm(client);
 };
 function objectChanged()
 {
-  var client = getObjectFromForm();
+  var client = getDataFromForm();
 
-  if (!validateInput(client))
-      showError(client)
-  else
-  {
-    saveToLocalStorage("client",client);
-  }
+  saveToLocalStorage("formData",client);
 };
 function saveToLocalStorage(name,value) {
   localStorage.setItem(name, JSON.stringify(value));
@@ -90,11 +91,10 @@ function readFromLocalStorage(name) {
   var client = JSON.parse(retrievedObject);
   return client;
 };
-function getObjectFromForm()
+function getDataFromForm()
 {
   var clientFirstName = document.getElementById("tbClientFirstName").value;
   var clientLastName = document.getElementById("tbClientLastName").value;
-
   var clientCity = document.getElementById("tbClientCity").value;
   var clientStreet = document.getElementById("tbClientStreet").value;
   var clientPostalCode = document.getElementById("tbClientPostalCode").value;
@@ -102,17 +102,44 @@ function getObjectFromForm()
   var clientAdress = {city:clientCity, street:clientStreet, postalCode:clientPostalCode};
   var client = {firstName:clientFirstName, lastName:clientLastName, adress:clientAdress };
 
-  
-};
-function setObjectToForm(client)
-{
-  document.getElementById("tbClientFirstName").value = client.firstName != undefined ? client.firstName : '';
-  document.getElementById("tbClientLastName").value= client.clientLastName != undefined ? client.clientLastName : '';
+  var companyName = document.getElementById("tbCompanyName").value;
+  var companyTaxNumber = document.getElementById("tbCompanyTaxNumber").value;
+  var companyCity = document.getElementById("tbCompanyCity").value;
+  var companyStreet = document.getElementById("tbCompanyStreet").value;
+  var companyPostalCode = document.getElementById("tbCompanyPostalCode").value;
 
-  if(client.adress != undefined){
-    document.getElementById("tbClientCity").value = client.adress.city != undefined ? client.adress.city : '';
-    document.getElementById("tbClientStreet").value = client.adress.street != undefined ? client.adress.street : '';
-    document.getElementById("tbClientPostalCode").value = client.adress.postalCode != undefined ? client.adress.postalCode : '';
+  var companyAdress = {city:companyCity, street:companyStreet, postalCode:companyPostalCode};
+  var company = {name:companyName, taxNumber:companyTaxNumber, adress:companyAdress };
+
+  var invoiceAmount = document.getElementById("tbAmount").value;
+  var radios = document.getElementsByName('invoiceStatus');
+  var invoiceStatus = 'issued';
+  for (var i = 0, length = radios.length; i < length; i++) {
+      if (radios[i].checked) {
+          invoiceStatus = radios[i].value;
+          break;
+      }
+  }
+  var invoice = {invoiceAmount:invoiceAmount, invoiceStatus:invoiceStatus};
+  var currentdate = new Date();
+  var datetime = "Last Sync: " + currentdate.getDate() + "/"
+                  + (currentdate.getMonth()+1)  + "/"
+                  + currentdate.getFullYear() + " @ "
+                  + currentdate.getHours() + ":"
+                  + currentdate.getMinutes() + ":"
+                  + currentdate.getSeconds();
+  var formData = {client:client, company:company, invoice:invoice,datetime:datetime};
+  return formData;
+};
+function setDataToForm(formData)
+{
+  document.getElementById("tbClientFirstName").value = formData.client.firstName != undefined ? formData.client.firstName : '';
+  document.getElementById("tbClientLastName").value= formData.client.clientLastName != undefined ? formData.client.clientLastName : '';
+
+  if(formData.client.adress != undefined){
+    document.getElementById("tbClientCity").value = formData.client.adress.city != undefined ? formData.client.adress.city : '';
+    document.getElementById("tbClientStreet").value = formData.client.adress.street != undefined ? formData.client.adress.street : '';
+    document.getElementById("tbClientPostalCode").value = formData.client.adress.postalCode != undefined ? formData.client.adress.postalCode : '';
   }
   else {
     document.getElementById("tbClientCity").value = '';
@@ -120,7 +147,32 @@ function setObjectToForm(client)
     document.getElementById("tbClientPostalCode").value = '';
   }
 
+  document.getElementById("tbCompanyName").value = formData.company.companyName != undefined ? formData.company.companyName : '';
+  document.getElementById("tbCompanyTaxNumber").value= formData.company.taxNumber != undefined ? formData.company.taxNumber : '';
 
-  return client;
+  if(formData.company.adress != undefined){
+    document.getElementById("tbCompanyCity").value = formData.company.adress.city != undefined ? formData.company.adress.city : '';
+    document.getElementById("tbCompanyStreet").value = formData.company.adress.street != undefined ? formData.company.adress.street : '';
+    document.getElementById("tbCompanyPostalCode").value = formData.company.adress.postalCode != undefined ? formData.company.adress.postalCode : '';
+  }
+  else {
+    document.getElementById("tbCompanyCity").value = '';
+    document.getElementById("tbCompanyStreet").value = '';
+    document.getElementById("tbCompanyPostalCode").value = '';
+  }
+  document.getElementById("tbAmount").value = formData.invoice.invoiceAmount != undefined ? formData.invoice.invoiceAmount : '';
+
+  var radios = document.getElementsByName('invoiceStatus');
+  var invoiceStatus =formData.invoice.invoiceStatus != undefined ? formData.invoice.invoiceStatus : 'issued';
+
+  for (var i = 0, length = radios.length; i < length; i++) {
+      if(invoiceStatus = radios[i].value){
+          radios[i].checked = true;
+      }
+      else{
+          radios[i].checked = false;
+      }
+  }
+  document.getElementById("lbUpdateDate").value = formData.datetime != undefined ? formData.datetime : '';
 };
 </script>
