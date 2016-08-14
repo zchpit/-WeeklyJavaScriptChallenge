@@ -7,15 +7,15 @@
     <br/>
     <label id=lbClientFirstName> First Name </label>
     <input type="input" text="" id="tbClientFirstName" />
-    <label id=lbClientSurname> Surname </label>
-    <input type="input" text="" id="tbClientSurname" />
+    <label id=lbClientLastName> Surname </label>
+    <input type="input" text="" id="tbClientLastName" />
   </div>
   <br/>
   <div id=companyInfo>
     <label id=lbClientCity> City </label>
     <input type="input" text="" id="tbClientCity" />
     <label id=lbClientStreet> Street </label>
-    <input type="input" text="" id="tbClientSurname" />
+    <input type="input" text="" id="tbClientStreet" />
     <label id=lbClientPostalCode> Postal code </label>
     <input type="input" text="" id="tbClientPostalCode" />
     <br/>
@@ -53,57 +53,74 @@
 </html>
 
 <script>
-document.getElementById("ddlUnit1").addEventListener("change", function(){
-  MakeConversion();
+window.onload = function() {
+  loadObjectAfterPageLoad();
+};
+/*
+document.getElementsByTagName("radio").addEventListener("change", function(){
+  objectChanged();
+});*/
+var input = document.getElementsByTagName("input")[0];
+input.addEventListener("input", function(){
+  objectChanged();
 });
-document.getElementById("ddlUnit2").addEventListener("change", function(){
-  MakeConversion();
-});
-document.getElementById("tbInput").addEventListener("input", function(){
-  MakeConversion();
-});
-
-//we kwnow about IEEE 754 issue but this task is not about it.
-//More info here: http://0.30000000000000004.com/
-function MakeConversion()
+function loadObjectAfterPageLoad()
 {
-  var number = document.getElementById("tbInput").value;
-  var unit1 = document.getElementById("ddlUnit1").value;
-  var unit2 = document.getElementById("ddlUnit2").value;
+  var client = readFromLocalStorage("client");
 
-  if (!ValidateInput(number))
-      ShowError(number)
+  if(client != null)
+    setObjectToForm(client);
+};
+function objectChanged()
+{
+  var client = getObjectFromForm();
+
+  if (!validateInput(client))
+      showError(client)
   else
   {
-    var numberInNewUnit = '';
-    ShowResult(numberInNewUnit);
+    saveToLocalStorage("client",client);
   }
-}
-function GetInput()
+};
+function saveToLocalStorage(name,value) {
+  localStorage.setItem(name, JSON.stringify(value));
+};
+function readFromLocalStorage(name) {
+  var retrievedObject = localStorage.getItem(name);
+  var client = JSON.parse(retrievedObject);
+  return client;
+};
+function getObjectFromForm()
 {
-	return document.getElementById("tbInput").value;;
-}
-function ValidateInput(input)
+  var clientFirstName = document.getElementById("tbClientFirstName").value;
+  var clientLastName = document.getElementById("tbClientLastName").value;
+
+  var clientCity = document.getElementById("tbClientCity").value;
+  var clientStreet = document.getElementById("tbClientStreet").value;
+  var clientPostalCode = document.getElementById("tbClientPostalCode").value;
+
+  var clientAdress = {city:clientCity, street:clientStreet, postalCode:clientPostalCode};
+  var client = {firstName:clientFirstName, lastName:clientLastName, adress:clientAdress };
+
+  
+};
+function setObjectToForm(client)
 {
-  var inputAfterConversion = parseFloat(input);
-  return IsNumeric(inputAfterConversion);
-}
-function ShowMessage(message)
-{
-  	document.getElementById("lbResult").textContent = message;
-}
-function IsNumeric(input)
-{
-    return (input - 0) == input && (''+input).trim().length > 0;
-}
-function ShowError(input)
-{
-  var response = "Result: " + input + " is not a number";
-	ShowMessage(response);
-}
-function ShowResult(result)
-{
-    var response = "Result: " + result;
-  	ShowMessage(response);
-}
+  document.getElementById("tbClientFirstName").value = client.firstName != undefined ? client.firstName : '';
+  document.getElementById("tbClientLastName").value= client.clientLastName != undefined ? client.clientLastName : '';
+
+  if(client.adress != undefined){
+    document.getElementById("tbClientCity").value = client.adress.city != undefined ? client.adress.city : '';
+    document.getElementById("tbClientStreet").value = client.adress.street != undefined ? client.adress.street : '';
+    document.getElementById("tbClientPostalCode").value = client.adress.postalCode != undefined ? client.adress.postalCode : '';
+  }
+  else {
+    document.getElementById("tbClientCity").value = '';
+    document.getElementById("tbClientStreet").value = '';
+    document.getElementById("tbClientPostalCode").value = '';
+  }
+
+
+  return client;
+};
 </script>
