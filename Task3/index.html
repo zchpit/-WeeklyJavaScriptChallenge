@@ -1,0 +1,109 @@
+<html>
+<head>
+</head>
+<body>
+  <div id="clientInfo">
+    <label id=lbClientInfo> Client info </label>
+    <br/>
+    <label id=lbClientFirstName> First Name </label>
+    <input type="input" text="" id="tbClientFirstName" />
+    <label id=lbClientSurname> Surname </label>
+    <input type="input" text="" id="tbClientSurname" />
+  </div>
+  <br/>
+  <div id=companyInfo>
+    <label id=lbClientCity> City </label>
+    <input type="input" text="" id="tbClientCity" />
+    <label id=lbClientStreet> Street </label>
+    <input type="input" text="" id="tbClientSurname" />
+    <label id=lbClientPostalCode> Postal code </label>
+    <input type="input" text="" id="tbClientPostalCode" />
+    <br/>
+    <label id=lbCompanyInfo> Company info </label>   <br/>
+    <label id=lbCompanyName> Company Name </label>
+    <input type="input" text="" id="tbCompanyName" />
+    <label id=lbCompanyTaxNumber> Tax number </label>
+    <input type="input" text="" id="tbCompanyTaxNumber" />
+    <br/>
+    <label id=lbCompanyCity> City </label>
+    <input type="input" text="" id="tbCompanyCity" />
+    <label id=lbCompanyStreet> Street </label>
+    <input type="input" text="" id="tbCompanySurname" />
+    <label id=lbCompanyPostalCode> Postal code </label>
+    <input type="input" text="" id="tbCompanyPostalCode" />
+  </div>
+  <br/>
+  <div id="invoiceInfo">
+    <label id=lbAmount> Amount </label>
+    <input type="input" text="" id="tbAmount" />
+    <br/>
+    <label id=lbInvoiceStatus> Invoice status </label>
+    <br/>
+    <input type="radio" name="invoiceStatus" value="issued" checked> issued <br/>
+    <input type="radio" name="invoiceStatus" value="delivered"> delivered <br/>
+    <input type="radio" name="invoiceStatus" value="paid"> paid <br/>
+    <input type="radio" name="invoiceStatus" value="late"> late
+  </div>
+  <br/>
+  <div id="updateInfo">
+    <label id=lbUpdateInfo> Last time updated </label>
+    <label id=lbUpdateDate> Amount </label>
+  </div>
+  </body>
+</html>
+
+<script>
+document.getElementById("ddlUnit1").addEventListener("change", function(){
+  MakeConversion();
+});
+document.getElementById("ddlUnit2").addEventListener("change", function(){
+  MakeConversion();
+});
+document.getElementById("tbInput").addEventListener("input", function(){
+  MakeConversion();
+});
+
+//we kwnow about IEEE 754 issue but this task is not about it.
+//More info here: http://0.30000000000000004.com/
+function MakeConversion()
+{
+  var number = document.getElementById("tbInput").value;
+  var unit1 = document.getElementById("ddlUnit1").value;
+  var unit2 = document.getElementById("ddlUnit2").value;
+
+  if (!ValidateInput(number))
+      ShowError(number)
+  else
+  {
+    var numberInNewUnit = '';
+    ShowResult(numberInNewUnit);
+  }
+}
+function GetInput()
+{
+	return document.getElementById("tbInput").value;;
+}
+function ValidateInput(input)
+{
+  var inputAfterConversion = parseFloat(input);
+  return IsNumeric(inputAfterConversion);
+}
+function ShowMessage(message)
+{
+  	document.getElementById("lbResult").textContent = message;
+}
+function IsNumeric(input)
+{
+    return (input - 0) == input && (''+input).trim().length > 0;
+}
+function ShowError(input)
+{
+  var response = "Result: " + input + " is not a number";
+	ShowMessage(response);
+}
+function ShowResult(result)
+{
+    var response = "Result: " + result;
+  	ShowMessage(response);
+}
+</script>
