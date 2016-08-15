@@ -63,9 +63,8 @@ var inputs = document.getElementsByTagName("input");
 for (var i = 0; i < inputs.length ; i++) {
     inputs[i].addEventListener("input",
         function () {
-            objectChanged();
-        },
-        false);
+            objectChanged(this.id);
+        });
 }
 var radios = document.querySelectorAll('input[type=radio][name="invoiceStatus"]');
 Array.prototype.forEach.call(radios, function(radio) {
@@ -75,30 +74,34 @@ Array.prototype.forEach.call(radios, function(radio) {
 function loadObjectAfterPageLoad(){
   var formData = readFromLocalStorage("formData");
 
-  if(formData.datetime === undefined || formData.datetime === ''){
-
-  }
-  else{
-      Validation(formData);
+  if(formData.client.adress.postalCode != '' || formData.company.adress.postalCode != '' ){
+    ValidationClientPostalCode(formData);
+    ValidationCompanyPostalCode(formData);
   }
 
   if(formData != null)
     setDataToForm(formData);
 };
-function objectChanged(){
+function objectChanged(controlChanged){
   var formData = getDataFromForm();
 
-  Validation(formData);
+  if(controlChanged === 'tbClientPostalCode' ){
+    ValidationClientPostalCode(formData);
+  }
+  if(controlChanged === 'tbCompanyPostalCode' ){
+    ValidationCompanyPostalCode(formData);
+  }
 
   saveToLocalStorage("formData",formData);
 };
-function Validation(formData){
+function ValidationClientPostalCode(formData){
   if(!validatePostalCode(formData.client.adress.postalCode))
-
     showValidationError("lbClientPostalCodeError");
   else{
     clearValidationError("lbClientPostalCodeError");
   }
+}
+function ValidationCompanyPostalCode(formData){
 
   if(!validatePostalCode(formData.company.adress.postalCode))
     showValidationError("lbCompanyPostalCodeError")
