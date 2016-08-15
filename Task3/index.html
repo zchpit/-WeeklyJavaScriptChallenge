@@ -18,6 +18,7 @@
     <input type="input" text="" id="tbClientStreet" />
     <label id=lbClientPostalCode> Postal code </label>
     <input type="input" text="" id="tbClientPostalCode" />
+    <label id=lbClientPostalCodeError style="color:red"></label>
     <br/>
     <label id=lbCompanyInfo> Company info </label>   <br/>
     <label id=lbCompanyName> Company Name </label>
@@ -31,6 +32,7 @@
     <input type="input" text="" id="tbCompanyStreet" />
     <label id=lbCompanyPostalCode> Postal code </label>
     <input type="input" text="" id="tbCompanyPostalCode" />
+    <label id=lbCompanyPostalCodeError style="color:red"></label>
   </div>
   <br/>
   <div id="invoiceInfo">
@@ -70,19 +72,40 @@ Array.prototype.forEach.call(radios, function(radio) {
    radio.addEventListener('change', objectChanged);
 });
 
-function loadObjectAfterPageLoad()
-{
-  var client = readFromLocalStorage("formData");
+function loadObjectAfterPageLoad(){
+  var formData = readFromLocalStorage("formData");
 
-  if(client != null)
-    setDataToForm(client);
-};
-function objectChanged()
-{
-  var client = getDataFromForm();
+  if(formData.datetime === undefined || formData.datetime === ''){
 
-  saveToLocalStorage("formData",client);
+  }
+  else{
+      Validation(formData);
+  }
+
+  if(formData != null)
+    setDataToForm(formData);
 };
+function objectChanged(){
+  var formData = getDataFromForm();
+
+  Validation(formData);
+
+  saveToLocalStorage("formData",formData);
+};
+function Validation(formData){
+  if(!validatePostalCode(formData.client.adress.postalCode))
+
+    showValidationError("lbClientPostalCodeError");
+  else{
+    clearValidationError("lbClientPostalCodeError");
+  }
+
+  if(!validatePostalCode(formData.company.adress.postalCode))
+    showValidationError("lbCompanyPostalCodeError")
+  else{
+    clearValidationError("lbCompanyPostalCodeError");
+  }
+}
 function saveToLocalStorage(name,value) {
   localStorage.setItem(name, JSON.stringify(value));
 };
@@ -91,8 +114,7 @@ function readFromLocalStorage(name) {
   var client = JSON.parse(retrievedObject);
   return client;
 };
-function getDataFromForm()
-{
+function getDataFromForm(){
   var clientFirstName = document.getElementById("tbClientFirstName").value;
   var clientLastName = document.getElementById("tbClientLastName").value;
   var clientCity = document.getElementById("tbClientCity").value;
@@ -132,8 +154,7 @@ function getDataFromForm()
   var formData = {client:client, company:company, invoice:invoice,datetime:datetime};
   return formData;
 };
-function setDataToForm(formData)
-{
+function setDataToForm(formData){
   document.getElementById("tbClientFirstName").value = formData.client.firstName != undefined ? formData.client.firstName : '';
   document.getElementById("tbClientLastName").value= formData.client.clientLastName != undefined ? formData.client.clientLastName : '';
 
@@ -175,4 +196,27 @@ function setDataToForm(formData)
   }
   document.getElementById("lbUpdateDate").textContent = formData.datetime != undefined ? formData.datetime : '';
 };
+function validatePostalCode(postalCode)
+{
+  //more postal code regex here: http://html5pattern.com/Postal_Codes
+  postalCodeRegexPL = '[0-9]{2}\-[0-9]{3}';
+  postalCodeRegexGER = '[0-9]{5}';
+  postalCodeUK = '[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? [0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}';
+
+  if(postalCode.match(postalCodeRegexPL)
+  || postalCode.match(postalCodeRegexGER)
+  || postalCode.match(postalCodeUK)){
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+function showValidationError(lblError){
+  document.getElementById(lblError).textContent = 'Validation Error. Please enter valid postal code';
+}
+function clearValidationError(lblError){
+  document.getElementById(lblError).textContent = '';
+}
 </script>
